@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HARYX XDR | Extended Detection &amp; Response</title>
+<style>
+:root{
+ --bg:#f3f6fb;--surface:#fff;--surface-2:#f7f9fc;--ink:#142238;--muted:#64748b;
+ --line:#e2e8f0;--blue:#1769aa;--blue-dark:#0b2545;--blue-soft:#e8f2fb;
+ --red:#b42318;--orange:#b54708;--green:#067647;--shadow:0 8px 24px rgba(15,35,65,.07)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 "Segoe UI",system-ui,Arial,sans-serif}
+header{background:linear-gradient(115deg,#081b34,#123c67);color:#fff;padding:18px clamp(16px,4vw,42px) 0;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:0 3px 16px #0b254522}
+.brand{display:flex;align-items:center;gap:12px;padding-bottom:16px}
+.logo{width:38px;height:38px;border-radius:11px;background:#1b6cae;display:grid;place-items:center;font-size:20px;font-weight:800}
+header h1{margin:0;font-size:21px;letter-spacing:.2px}
+header small{display:block;color:#b8d4f1;font-size:12px;margin-top:1px}
+nav{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto;align-self:stretch}nav.hidden{display:none}
+nav button{background:transparent;border:0;border-bottom:3px solid transparent;color:#d7e7f7;padding:12px 14px 13px;font:inherit;cursor:pointer;border-radius:7px 7px 0 0}
+nav button:hover{background:#ffffff12;color:#fff}
+nav button.on{color:#fff;border-bottom-color:#58b5ff;background:#ffffff12;font-weight:700}
+main{max-width:1240px;margin:0 auto;padding:26px 20px 54px}
+section{display:none}section.on{display:block}
+.pagehead{margin:0 0 18px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+.pagehead h2{font-size:25px;line-height:1.2;margin:0 0 5px;letter-spacing:-.4px}
+.pagehead p{margin:0;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:19px 20px;margin-bottom:15px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 12px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--blue)}
+.grid{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.drop{border:2px dashed #8bb8df;background:linear-gradient(180deg,#f7fbff,#edf5fc);border-radius:14px;padding:42px 20px;text-align:center;cursor:pointer;transition:.18s}
+.drop:hover,.drop.h{border-color:var(--blue);background:var(--blue-soft);transform:translateY(-1px)}
+.drop strong{display:block;font-size:17px;margin:7px 0;color:var(--ink)}
+.drop .upload-icon{font-size:30px;color:var(--blue)}
+.tag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:750;border:1px solid currentColor;margin:2px}
+.Crítica{color:var(--red);background:#fff0ee}.Alta{color:var(--orange);background:#fff5e8}
+.Media{color:var(--green);background:#ecfdf3}.Baja{color:var(--muted);background:#f1f5f9}
+.btn,button.b{background:var(--blue);color:#fff;border:1px solid var(--blue);border-radius:9px;padding:9px 15px;font:inherit;font-weight:700;cursor:pointer;transition:.15s}
+.btn:hover,button.b:hover{background:#0f548c;transform:translateY(-1px)}
+button.s{background:#fff;color:var(--ink);border:1px solid var(--line)}
+button.s:hover{background:var(--surface-2)}
+input,select,textarea{font:inherit;padding:10px 11px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:var(--ink);width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#4295d5;box-shadow:0 0 0 3px #1769aa18}
+label{display:block;font-size:12px;font-weight:650;color:var(--muted);margin:10px 0 5px}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:800px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:#52657d;font-size:10px;text-transform:uppercase;letter-spacing:.06em;background:#f7f9fc;position:sticky;top:0}
+tbody tr:hover{background:#f7fbff}
+td.q{font-family:Consolas,monospace;word-break:break-all}
+.wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:620px}
+.kc{display:flex;gap:5px;flex-wrap:wrap}
+.kc span{padding:4px 9px;border-radius:6px;border:1px solid var(--line);font-size:11px;color:var(--muted);background:#f8fafc}
+.kc span.on{background:#eaf3fc;border-color:#82b6e1;color:#145b91;font-weight:700}
+.dm{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:12px;min-height:70px;overflow-wrap:anywhere}
+.dm b{color:var(--blue);display:inline-block;margin-bottom:3px}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
+#rep{background:#fff;color:#172033;border:1px solid var(--line);border-radius:12px;padding:clamp(18px,3vw,34px);margin-top:15px;line-height:1.65;box-shadow:var(--shadow)}
+#rep h1{font-size:24px;margin:0 0 5px;color:#102b4c}
+#rep h2{font-size:16px;margin:22px 0 8px;padding-bottom:5px;border-bottom:1px solid #dbe3ed;color:#145b91}
+#rep td,#rep th{border-color:#ddd;color:#111}
+.sm{color:var(--muted);font-size:12px}
+.metric{padding:16px 18px}
+.metric h3{margin-bottom:5px}
+.metric strong{font-size:25px;line-height:1.2;display:block;color:var(--ink)}
+.metric small{color:var(--muted)}
+.inc-title{font-size:16px;font-weight:750;margin:3px 0 5px}
+details{background:#f8fafc;border:1px solid var(--line);padding:11px 13px;border-radius:9px;margin:12px 0}
+summary{cursor:pointer;font-weight:700;color:#244765}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toolbar input{max-width:420px}
+.statusline{padding:10px 12px;background:#eef6fd;border:1px solid #d6e8f8;border-radius:9px;color:#244765}
+@media(max-width:720px){header{padding:14px 14px 0;gap:6px}.brand{padding-bottom:8px}nav{width:100%;margin:0;overflow-x:auto}nav button{padding:10px 11px;font-size:12px}main{padding:18px 12px 36px}.pagehead h2{font-size:22px}.card{padding:15px}.drop{padding:30px 14px}}
+
+.report-cover{border-bottom:3px solid #00bfd6;padding:10px 0 18px;margin-bottom:18px}.report-brand{font-size:27px;font-weight:900;letter-spacing:2px;color:#0b132b}.report-brand span{color:#00a9c5}.report-sub,.report-kicker{font-size:9px;font-weight:800;letter-spacing:2px;color:#087e99}.report-cover h1{margin:22px 0 4px!important;font-size:25px!important}.report-meta{font-size:10px;line-height:1.8;padding:12px;background:#eef7fa;border-left:3px solid #00bfd6;margin:12px 0 18px}.report-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}.report-kpis div{border:1px solid #d7e3ea;padding:9px;text-align:center;border-radius:6px}.report-kpis b{display:block;font-size:20px;color:#0b132b}.report-kpis span{font-size:9px;color:#536277}.report-incident{margin-top:18px}.report-incident h2{break-after:avoid}.report-incident table{width:100%;border-collapse:collapse;font-size:8px}.report-incident th,.report-incident td{padding:4px;border:1px solid #d7e3ea;vertical-align:top;overflow-wrap:anywhere}
+@media print{.report-incident{break-before:page;page-break-before:always}.report-cover{break-after:avoid}.report-incident table{font-size:7px}#rep{font-size:9pt}#rep h2{break-after:avoid}a{color:#111;text-decoration:none}}
+@media print{header,.np{display:none!important}main>section{display:none!important}main>#s-rep{display:block!important}body{background:#fff}main{max-width:none;padding:0}#rep{border:0;box-shadow:none;padding:0}.card{box-shadow:none}}
+
+.mitre-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.mitre-card{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
+.mitre-card b{color:var(--blue);display:block}
+.mitre-card small{color:var(--muted)}
+.bar{height:8px;background:#e8eef5;border-radius:99px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:#2584c7}
+.case-row{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.pill{display:inline-block;padding:3px 8px;border-radius:99px;background:#edf5fc;color:#145b91;font-size:11px;font-weight:700}
+.timeline{border-left:2px solid #b8d5ec;margin:12px 0 12px 8px;padding-left:18px}.timeline-item{position:relative;padding:0 0 14px}.timeline-item:before{content:"";position:absolute;left:-24px;top:5px;width:9px;height:9px;border-radius:50%;background:#2584c7;border:2px solid #fff;box-shadow:0 0 0 1px #2584c7}
+@media(max-width:720px){.case-row{grid-template-columns:1fr 1fr}.case-row>*:first-child{grid-column:1/-1}}
+
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:14px}
+.chart-card{min-width:0}.chart-card h3{margin-top:0;margin-bottom:16px}
+.chart-row{display:grid;grid-template-columns:82px 1fr 24px;gap:9px;align-items:center;margin:12px 0;font-size:12px}
+.chart-track{height:11px;border-radius:99px;background:#edf2f7;overflow:hidden}
+.chart-track i{display:block;height:100%;border-radius:99px;background:#2584c7;min-width:0}
+.chart-card svg{width:100%;height:auto;display:block;overflow:visible}
+.welcome{min-height:calc(100vh - 125px);display:grid;place-items:center;padding:28px 10px}
+.welcome-panel{max-width:850px;width:100%;padding:clamp(28px,6vw,64px);border-radius:24px;background:radial-gradient(circle at 85% 15%,#1e6598 0,transparent 35%),linear-gradient(135deg,#071a30,#123e68);color:#fff;box-shadow:0 24px 60px #09233d30;position:relative;overflow:hidden}
+.welcome-mark{width:58px;height:58px;border-radius:17px;background:#2484c7;display:grid;place-items:center;font-size:29px;font-weight:900;margin-bottom:28px}
+.welcome-panel h2{font-size:clamp(34px,6vw,56px);line-height:1.04;letter-spacing:-1.5px;margin:0 0 15px}
+.welcome-panel p{font-size:16px;color:#c9def2;max-width:620px;line-height:1.7}
+.welcome-points{display:flex;gap:9px;flex-wrap:wrap;margin:25px 0 30px}
+.welcome-points span{border:1px solid #ffffff35;background:#ffffff0d;padding:8px 12px;border-radius:99px;font-size:12px;color:#e5f2ff}
+.welcome-panel .btn{background:#fff;color:#0b3154;border-color:#fff;padding:12px 22px;font-size:14px}
+.ip-kind{display:inline-block;border-radius:99px;padding:3px 8px;font-size:10px;font-weight:750;background:#edf5fc;color:#145b91}
+
+.chart-card .sm{color:var(--muted);font-size:11px}
+@media(max-width:600px){.chart-grid{grid-template-columns:1fr}}
+
+/* HARYX XDR brand system */
+:root{--bg:#07111f;--surface:#0b1b2e;--surface-2:#10243a;--ink:#e2e8f0;--muted:#9fb3c8;--line:#1d3a55;--blue:#00cfe8;--blue-dark:#0b132b;--blue-soft:#10324a;--shadow:0 10px 30px rgba(0,0,0,.24)}
+body{background:radial-gradient(ellipse at 50% -20%,#12385a 0,transparent 48%),var(--bg);color:var(--ink)}
+header{background:linear-gradient(110deg,#050d19,#0b1b32 65%,#0d2b49);border-bottom:1px solid #164363;box-shadow:0 5px 24px #0008}
+.brand{gap:13px}.logo{width:58px;height:64px;border-radius:12px;background:transparent;filter:drop-shadow(0 0 9px #00e5ff66)}.logo svg{width:100%;height:100%}.brand-x{color:#00e5ff;font-weight:850}.brand small{color:#9fc7df}
+nav button{color:#b9cede}nav button:hover,nav button.on{background:#00e5ff12;color:#fff}nav button.on{border-bottom-color:#00e5ff}
+main{max-width:1380px}.eyebrow{color:#00cfe8}.pagehead p,.sm{color:var(--muted)}
+.card,.mitre-card,.dm,details{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:var(--shadow)}
+.card h3,.dm b,.mitre-card b{color:#00d9f5}
+.drop{background:linear-gradient(145deg,#0d263e,#0a1a2c);border-color:#176184;color:var(--ink)}.drop strong{color:#e2e8f0}.drop:hover,.drop.h{background:#10324a;border-color:#00e5ff}.drop .upload-icon{color:#00e5ff}
+.btn,button.b{background:#007f9e;border-color:#00cfe8;color:#fff}.btn:hover,button.b:hover{background:#009bb5}.welcome-panel .btn{background:#00e5ff;color:#07111f;border-color:#00e5ff}.welcome-panel .btn:hover{background:#72f1ff}
+input,select,textarea{background:#081827;border-color:#28506b;color:#e2e8f0}input::placeholder,textarea::placeholder{color:#7892a9}input:focus,select:focus,textarea:focus{border-color:#00dff5;box-shadow:0 0 0 3px #00dff522}
+button.s{background:#10243a;color:#dce9f5;border-color:#28506b}button.s:hover{background:#16324c}
+table{color:#dce8f4}th{background:#10243a;color:#9fc4dc}tbody tr:hover{background:#12304a}th,td{border-color:#1d3a55}
+.kc span{background:#10243a;border-color:#29445e;color:#a9bfd2}.kc span.on,.pill{background:#103c50;border-color:#087d9a;color:#67eaff}
+.Crítica{color:#ff8b91;background:#4a1d2a}.Alta{color:#ffc078;background:#49301b}.Media{color:#72e0ae;background:#123b31}.Baja{color:#a9bfd2;background:#1a2c3d}
+.statusline{background:#0c2b40;border-color:#15516b;color:#b9e9f5}
+.chart-track,.bar{background:#18344b}.chart-track i,.bar i{background:linear-gradient(90deg,#007f9e,#00e5ff)}
+.timeline{border-left-color:#176184}.timeline-item:before{background:#00dff5;box-shadow:0 0 0 1px #00dff5}
+.welcome{min-height:calc(100vh - 125px)}.welcome-panel{max-width:900px;background:radial-gradient(circle at 80% 12%,#006b8a55 0,transparent 34%),linear-gradient(135deg,#07111f,#0b2944 68%,#071b2c);border:1px solid #12617d;box-shadow:0 25px 80px #0009,0 0 35px #00dfff12}.welcome-mark{width:142px;height:158px;background:transparent;border-radius:0;filter:drop-shadow(0 0 18px #00dfff55);margin-bottom:18px}.welcome-mark svg{width:100%;height:100%}.welcome-panel h2{letter-spacing:-1px}.welcome-panel p{color:#b8d0e2}.welcome-points span{border-color:#176184;background:#00dfff0b;color:#c9f6ff}
+.ip-kind{background:#103c50;color:#67eaff}
+#rep{background:#fff;color:#172033}#rep h1{color:#102b4c}#rep h2{color:#145b91}#rep td,#rep th{color:#111}
+@media print{body{background:#fff}}
+
+</style></head><body>
+<header><div class="brand"><div class="logo" aria-label="Escudo HARYX"><svg viewBox="0 0 180 200" role="img" aria-label="Escudo HARYX XDR" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="hxMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".32" stop-color="#9fb6c8"/><stop offset=".62" stop-color="#f4fbff"/><stop offset="1" stop-color="#00dff5"/></linearGradient>
+ <linearGradient id="hxFill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102b43"/><stop offset=".55" stop-color="#061322"/><stop offset="1" stop-color="#123b55"/></linearGradient>
+ <filter id="hxGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<path d="M90 5 158 28v54c0 48-26 82-68 108C48 164 22 130 22 82V28Z" fill="url(#hxFill)" stroke="url(#hxMetal)" stroke-width="7" stroke-linejoin="round"/>
+<path d="M90 15 148 35v46c0 41-22 70-58 94-36-24-58-53-58-94V35Z" fill="none" stroke="#00dff5" stroke-opacity=".65" stroke-width="2"/>
+<path d="M61 58v75M119 58v75M61 96h58" fill="none" stroke="url(#hxMetal)" stroke-width="15" stroke-linecap="square" stroke-linejoin="round"/>
+<g fill="none" stroke="#00e5ff" stroke-width="4" stroke-linecap="round" filter="url(#hxGlow)"><path d="M90 24v25m-15-12 15 12 15-12M90 49v10M72 143v10m36-10v10"/><circle cx="90" cy="63" r="3" fill="#00e5ff"/></g>
+<path d="M16 111C40 137 129 128 165 72" fill="none" stroke="#00e5ff" stroke-width="7" stroke-linecap="round" filter="url(#hxGlow)"/>
+<path d="M16 111C40 137 129 128 165 72" fill="none" stroke="#baf8ff" stroke-opacity=".8" stroke-width="1.5"/>
+<g transform="translate(78 119)" filter="url(#hxGlow)"><rect x="0" y="8" width="24" height="22" rx="4" fill="#00dff5"/><path d="M5 9V5a7 7 0 0 1 14 0v4" fill="none" stroke="#00dff5" stroke-width="4"/><circle cx="12" cy="18" r="2.5" fill="#062036"/><path d="M12 20v4" stroke="#062036" stroke-width="2"/></g>
+</svg></div><div><h1>HARYX <span class="brand-x">XDR</span></h1><small>Extended Detection &amp; Response</small></div></div>
+<nav id="nav"></nav></header>
+<main>
+<section id="s-welcome" class="on"><div class="welcome"><div class="welcome-panel"><div class="welcome-mark"><svg viewBox="0 0 180 200" role="img" aria-label="Escudo HARYX XDR" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="hxMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".32" stop-color="#9fb6c8"/><stop offset=".62" stop-color="#f4fbff"/><stop offset="1" stop-color="#00dff5"/></linearGradient>
+ <linearGradient id="hxFill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102b43"/><stop offset=".55" stop-color="#061322"/><stop offset="1" stop-color="#123b55"/></linearGradient>
+ <filter id="hxGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<path d="M90 5 158 28v54c0 48-26 82-68 108C48 164 22 130 22 82V28Z" fill="url(#hxFill)" stroke="url(#hxMetal)" stroke-width="7" stroke-linejoin="round"/>
+<path d="M90 15 148 35v46c0 41-22 70-58 94-36-24-58-53-58-94V35Z" fill="none" stroke="#00dff5" stroke-opacity=".65" stroke-width="2"/>
+<path d="M61 58v75M119 58v75M61 96h58" fill="none" stroke="url(#hxMetal)" stroke-width="15" stroke-linecap="square" stroke-linejoin="round"/>
+<g fill="none" stroke="#00e5ff" stroke-width="4" stroke-linecap="round" filter="url(#hxGlow)"><path d="M90 24v25m-15-12 15 12 15-12M90 49v10M72 143v10m36-10v10"/><circle cx="90" cy="63" r="3" fill="#00e5ff"/></g>
+<path d="M16 111C40 137 129 128 165 72" fill="none" stroke="#00e5ff" stroke-width="7" stroke-linecap="round" filter="url(#hxGlow)"/>
+<path d="M16 111C40 137 129 128 165 72" fill="none" stroke="#baf8ff" stroke-opacity=".8" stroke-width="1.5"/>
+<g transform="translate(78 119)" filter="url(#hxGlow)"><rect x="0" y="8" width="24" height="22" rx="4" fill="#00dff5"/><path d="M5 9V5a7 7 0 0 1 14 0v4" fill="none" stroke="#00dff5" stroke-width="4"/><circle cx="12" cy="18" r="2.5" fill="#062036"/><path d="M12 20v4" stroke="#062036" stroke-width="2"/></g>
+</svg></div><div class="eyebrow" style="color:#8bcaff">EXTENDED DETECTION · RESPONSE</div><h2>Bienvenido a<br>HARYX XDR</h2><p>Convierte tus registros en visibilidad de seguridad. Importa tus logs, identifica actividad sospechosa, explora indicadores y gestiona incidentes desde un solo panel.</p><div class="welcome-points"><span>◈ Dashboard XDR</span><span>⌁ Correlación de eventos</span><span>◎ MITRE ATT&amp;CK</span><span>▤ Gestión de casos</span></div><button class="btn" id="welcomeNext">Comenzar análisis&nbsp; →</button><p style="font-size:11px;margin-top:22px;color:#9dbbd6">El análisis se ejecuta localmente en tu navegador. Tus archivos no se envían a un servidor.</p></div></div></section>
+<section id="s-imp">
+<div class="pagehead"><div class="eyebrow">Centro de operaciones de seguridad</div><h2>Importar registros</h2><p>Selecciona el archivo de logs para iniciar el análisis y construir tu dashboard de seguridad.</p></div>
+<div class="card"><h3>Importar registros</h3>
+<div class="drop" id="dz"><div class="upload-icon">⇧</div><strong>Arrastra tu archivo aquí o haz clic para seleccionarlo</strong><span class="sm">Formatos admitidos: CSV, Excel, JSON, TXT y LOG · El análisis se realiza en este navegador</span></div>
+<input type="file" id="fi" accept=".csv,.xlsx,.xls,.json,.txt,.log" hidden></div>
+<div id="stat"></div></section>
+<section id="s-evt"><div class="pagehead"><div class="eyebrow">Explorador de datos</div><h2>Eventos normalizados</h2><p>Consulta y filtra los registros cargados para localizar actividad relevante.</p></div><div class="card"><h3>Registros importados</h3><input id="q" placeholder="Filtrar por texto, IP, usuario, host, ID…"><p class="sm" id="qn"></p><div class="wrap"><table id="tb"></table></div></div></section>
+<section id="s-inc"><div class="pagehead"><div class="eyebrow">Detección y correlación</div><h2>Incidentes identificados</h2><p>Hallazgos agrupados por patrones, severidad y contexto de los eventos.</p></div><div id="inc"></div></section>
+<section id="s-dash"><div class="pagehead"><div class="eyebrow">Visión general</div><h2>Dashboard XDR</h2><p>Resumen operativo calculado a partir del último conjunto de registros importado.</p></div><div id="dash"></div></section>
+<section id="s-mitre"><div class="pagehead"><div class="eyebrow">Marco de referencia</div><h2>MITRE ATT&amp;CK</h2><p>Técnicas asociadas por las reglas de detección de HARYX XDR. La asociación es una hipótesis analítica basada en los registros, no una confirmación de atribución.</p></div><div id="mitre"></div></section>
+<section id="s-time"><div class="pagehead"><div class="eyebrow">Análisis temporal</div><h2>Línea de tiempo</h2><p>Secuencia cronológica de los eventos que forman incidentes detectados.</p></div><div id="timeline"></div></section>
+<section id="s-cases"><div class="pagehead"><div class="eyebrow">Respuesta a incidentes</div><h2>Gestión de casos</h2><p>Seguimiento local de estado, responsable y notas de investigación.</p></div><div id="cases"></div></section>
+<section id="s-rep"><div class="pagehead"><div class="eyebrow">Documentación</div><h2>Generador de informes</h2><p>Prepara un informe ejecutivo o técnico a partir de los incidentes detectados.</p></div><div class="card np"><h3>Configurar informe completo</h3><div class="grid">
+<div><label for="rt">Tipo de informe</label><select id="rt"><option value="e">Ejecutivo</option><option value="t">Técnico</option></select></div>
+<div class="statusline"><b>Alcance:</b> se incluirán todos los incidentes detectados en la importación actual, dentro de un único documento.</div></div><br>
+<button class="b" id="g1">Preparar informe completo</button> <button class="b s" id="g3">Guardar un único PDF</button>
+<p class="sm">Selecciona el tipo de informe y pulsa “Guardar un único PDF”. En la ventana de impresión elige “Guardar como PDF”. Se incluirán todos los incidentes.</p><p class="sm" id="rs"></p></div>
+<div id="rep">Importa logs y genera un informe.</div></section>
+<section id="s-cfg">
+<div class="pagehead"><div class="eyebrow">Preferencias del proyecto</div><h2>Datos del informe</h2><p>Esta información aparecerá en los informes que generes.</p></div>
+<div class="card"><h3>Empresa y analista</h3><div class="grid">
+<div><label for="co">Empresa / organización</label><input id="co" placeholder="Nombre de la organización"></div>
+<div><label for="an">Analista responsable</label><input id="an" placeholder="Nombre del analista"></div></div><br>
+<button class="b" id="sv">Guardar datos</button> <span class="sm" id="cm"></span></div>
+<div class="card"><h3>Privacidad y procesamiento</h3><p class="sm">Los archivos seleccionados se procesan localmente en el navegador. Los datos de empresa y analista se guardan en el almacenamiento local de este navegador.</p></div>
+</section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),H=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let EV=[],INC=[];
+const KC=["Reconocimiento","Armamento","Entrega","Explotación","Instalación","C2","Acciones sobre objetivos"];
+const TT={"T1110.003":["Password Spraying","Credential Access","Explotación"],"T1110.001":["Brute Force","Credential Access","Explotación"],"T1078":["Valid Accounts","Initial Access","Explotación"],"T1021.001":["Remote Desktop Protocol","Lateral Movement","Explotación"],"T1059.001":["PowerShell","Execution","Explotación"],"T1059.003":["Windows Command Shell","Execution","Explotación"],"T1490":["Inhibit System Recovery","Impact","Acciones sobre objetivos"],"T1560.001":["Archive via Utility","Collection","Acciones sobre objetivos"],"T1074":["Data Staged","Collection","Acciones sobre objetivos"],"T1053.005":["Scheduled Task","Persistence","Instalación"],"T1543.003":["Windows Service","Persistence","Instalación"],"T1036":["Masquerading","Defense Evasion","Instalación"],"T1505.003":["Web Shell","Persistence","Instalación"],"T1190":["Exploit Public-Facing Application","Initial Access","Explotación"],"T1087":["Account Discovery","Discovery","Reconocimiento"],"T1135":["Network Share Discovery","Discovery","Reconocimiento"],"T1041":["Exfiltration Over C2 Channel","Exfiltration","Acciones sobre objetivos"],"T1048":["Exfiltration Over Alternative Protocol","Exfiltration","Acciones sobre objetivos"],"T1039":["Data from Network Shared Drive","Collection","Acciones sobre objetivos"]};
+const RU={"Password spray":[["T1110.003"],"¿Hay MFA y bloqueo de cuenta? ¿Qué cuentas validaron contraseña?","Bloquear la IP de origen y exigir cambio de contraseña en las cuentas afectadas"],
+"Fuerza bruta":[["T1110.001"],"¿Hay MFA y bloqueo de cuenta?","Bloquear la IP de origen y revisar la cuenta objetivo"],
+"Acceso tras fallos":[["T1078"],"¿Qué hizo la cuenta después del acceso exitoso?","Restablecer credenciales y revocar sesiones de la cuenta"],
+"RDP desde IP externa":[["T1021.001"],"¿RDP expuesto sin NLA, MFA o VPN?","Cerrar RDP al exterior, bloquear la IP y deshabilitar la cuenta"],
+"PowerShell codificado":[["T1059.001"],"Decodificar el comando y revisar el script","Aislar el equipo si no hay ticket y preservar evidencia"],
+"Inhibición de recuperación":[["T1490"],"¿Hay cifrado u otros equipos afectados? ¿Backups offline íntegros?","Aislar el equipo, rotar credenciales de la cuenta y validar backups"],
+"Archivado de datos":[["T1560.001","T1074"],"¿Qué contiene el archivo y qué tamaño tiene?","Preservar el archivo y revisar a dónde fueron los datos"],
+"Tarea programada nueva":[["T1053.005"],"¿Existe ticket de cambio? Revisar hash y script","Deshabilitar la tarea sin borrarla (evidencia)"],
+"Servicio nuevo":[["T1543.003"],"¿Existe ticket de cambio? Revisar hash y firma del binario","Deshabilitar el servicio sin borrarlo (evidencia)"],
+"Ejecución desde ruta no estándar":[["T1036"],"Revisar hash, firma y reputación del ejecutable","Poner el binario en cuarentena tras copiarlo para análisis"],
+"Comandos vía web (web shell)":[["T1505.003","T1190"],"¿Cómo y cuándo llegó el archivo al servidor? ¿Qué datos devolvió?","Bloquear la IP en WAF y poner el archivo en cuarentena tras copiarlo"],
+"Sondeo web":[["T1190"],"¿Hay un pentest agendado desde esa IP?","Bloquear la IP en WAF"],
+"Proceso hijo de servidor web":[["T1505.003","T1059.003"],"¿Qué otros procesos lanzó el app pool?","Aislar el servidor si el servicio lo permite"],
+"Reconocimiento interno":[["T1087","T1135"],"¿Qué más enumeró la cuenta?","Revisar la actividad posterior de la cuenta"],
+"Exfiltración HTTPS":[["T1041"],"¿El destino está autorizado? ¿Qué contenido salió?","Bloquear el destino en proxy y revocar sesiones del usuario"],
+"Conexión saliente de script":[["T1048"],"¿Cuántos bytes salieron y a qué destino?","Bloquear el destino y aislar el equipo si se autoriza"],
+"Lectura masiva de archivos":[["T1039"],"¿Hay ventana de mantenimiento o tarea de backup legítima?","Revocar sesiones de la cuenta y revisar el recurso compartido"]};
+const AL={ts:["timestamp","time","@timestamp","date","datetime","timecreated"],host:["hostname","host","computer","computername","device"],user:["user","username","account","accountname","targetusername"],src:["source_ip","src_ip","srcip","sourceip","src","ip","clientip"],dst:["destination","dst","dest","destination_ip","dst_ip","target"],eid:["event_id","eventid","eventcode","id"],msg:["event_description","message","msg","description"],cmd:["process_commandline","commandline","cmdline","command","uri","url"],res:["result","status","outcome"],sev:["severity","level","priority"],lid:["log_id","logid","uid"],country:["country","country_name","geo_country","source_country","ip_country","pais","país"]};
+const fmt=ms=>{const d=new Date(ms),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds())};
+const priv=ip=>/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.)/.test(ip||""),ext=ip=>/^\d+\.\d+\.\d+\.\d+$/.test(ip||"")&&!priv(ip)&&! /^(192\.0\.2\.|198\.51\.100\.|203\.0\.113\.)/.test(ip||"");
+function csv(t){const f1=t.split("\n")[0],cn=c=>f1.split(c).length,d=[",",";","\t"].sort((a,b)=>cn(b)-cn(a))[0],r=[];let row=[],f="",q=0;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=0}else f+=c}else if(c=='"')q=1;else if(c==d){row.push(f);f=""}else if(c=="\n"){row.push(f);r.push(row);row=[];f=""}else if(c!="\r")f+=c}if(f||row.length){row.push(f);r.push(row)}const h=r.shift().map(x=>x.trim());return r.filter(x=>x.length>1||x[0]).map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]])))}
+function line(l){const o={message:l,commandline:l},m=l.match(/\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}/);if(m)o.timestamp=m[0];const ip=l.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);if(ip)o.src=ip[0];const u=l.match(/user(?:name)?[=: ]+([\w\\.\-$]+)/i);if(u)o.user=u[1];const e=l.match(/\b(4624|4625|4672|4688|4698|7045|4104|5140|5145|5156|4663)\b/);if(e)o.eventid=e[1];return o}
+function norm(o){const k={};for(const a in o)k[a.toLowerCase().replace(/[\s_\-]/g,"")]=o[a];const g=n=>{for(const a of AL[n]){const v=k[a.replace(/[_\s-]/g,"")];if(v!==undefined&&v!=="")return v}return""};let t=g("ts");t=t instanceof Date?t.getTime():new Date(String(t).replace(" ","T")).getTime();return{id:String(g("lid")),t:isNaN(t)?0:t,host:String(g("host")),user:String(g("user")),src:String(g("src")),dst:String(g("dst")),eid:String(g("eid")),msg:String(g("msg")),cmd:String(g("cmd")),res:String(g("res")),sev:String(g("sev")),country:String(g("country"))}}
+async function load(f){const x=f.name.toLowerCase().split(".").pop();let rows;
+if(/^xlsx?$/.test(x)){if(!window.XLSX)return alert("No se pudo cargar la librería de Excel (¿sin internet?). Exporta a CSV e inténtalo de nuevo.");const wb=XLSX.read(await f.arrayBuffer(),{cellDates:true});rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""})}
+else{const t=await f.text();if(x=="json"){let j;try{j=JSON.parse(t)}catch(e){j=t.trim().split("\n").map(l=>JSON.parse(l))}rows=Array.isArray(j)?j:j.events||j.records||j.logs||[j]}else if(x=="csv")rows=csv(t);else rows=t.split("\n").filter(l=>l.trim()).map(line)}
+EV=rows.map(norm).sort((a,b)=>a.t-b.t).map((e,i)=>(e.i=i,e.id=e.id||"L"+String(i+1).padStart(5,"0"),e));
+INC=det();$("#stat").innerHTML=stat(f.name);tbl();incs();sel();renderDash();renderMitre();renderTimeline();renderCases();show("s-dash")}
+const by=(a,f)=>{const m={};a.forEach(e=>{const k=f(e);(m[k]=m[k]||[]).push(e)});return m};
+const burst=(a,min,n)=>{let j=0;for(let i=0;i<a.length;i++){while(a[i].t-a[j].t>min*6e4)j++;if(i-j+1>=n)return 1}return 0};
+const fail=e=>e.eid=="4625"||(/fail|denied|invalid|bad password/i.test(e.msg+" "+e.res)&&!/^success/i.test(e.res));
+const okk=e=>e.eid=="4624"||(/success/i.test(e.res)&&/log ?on/i.test(e.msg));
+const uv=u=>u&&u!="-";
+function det(){const D=[],add=(rule,sev,es,keys,note,nu)=>{if(es.length)D.push({rule,sev,es:[...new Set(es)].sort((a,b)=>a.t-b.t),keys:[...new Set(keys.filter(Boolean))],note,nu})},K=e=>[uv(e.user)&&"u:"+e.user,ext(e.src)&&"s:"+e.src],KS=a=>a.flatMap(K),txt=e=>e.cmd+" "+e.msg;
+const F=EV.filter(fail),fs=by(F.filter(e=>e.src),e=>e.src);
+for(const ip in fs){const a=fs[ip],us=new Set(a.map(e=>e.user));if(burst(a,10,10)){const sp=us.size>=5;add(sp?"Password spray":"Fuerza bruta",ext(ip)?"Alta":"Media",a,ext(ip)?["s:"+ip]:["f:"+ip],a.length+" fallos contra "+us.size+" cuentas desde "+ip,1)}}
+EV.filter(okk).forEach(s=>{const fl=F.filter(f=>f.src==s.src&&f.user==s.user&&f.t<s.t&&s.t-f.t<18e5);if(fl.length>=3)add("Acceso tras fallos",ext(s.src)?"Alta":"Media",[...fl,s],K(s),fl.length+" fallos de "+s.user+" desde "+s.src+" y luego acceso exitoso")});
+const rd=EV.filter(e=>ext(e.src)&&/LogonType=10|RDP/i.test(e.msg));add("RDP desde IP externa","Alta",rd,KS(rd),rd.length+" eventos RDP desde IP externa");
+const grp=(rule,sev,f,note)=>by(EV.filter(f),e=>e.user+"|"+e.host).constructor&&Object.values(by(EV.filter(f),e=>e.user+"|"+e.host)).forEach(a=>add(rule,sev,a,KS(a),note(a)));
+grp("PowerShell codificado","Alta",e=>/-enc(odedcommand)?\b|frombase64string/i.test(e.cmd),a=>a.length+" comando(s) codificado(s) de "+a[0].user+" en "+a[0].host);
+grp("Inhibición de recuperación","Crítica",e=>/vssadmin.*delete\s+shadows|wbadmin.*delete|bcdedit.*recoveryenabled\s+no|shadowcopy\s+delete/i.test(e.cmd),a=>"Borrado de copias de seguridad por "+a[0].user+" en "+a[0].host);
+grp("Archivado de datos","Alta",e=>/(7z|7za|rar|zip|tar)(\.exe)?\s+(a|-a|-c|-cf|-czf|-acf)\b/i.test(e.cmd),a=>"Compresión de datos por "+a[0].user+": "+a[0].cmd.slice(0,70));
+grp("Tarea programada nueva","Media",e=>e.eid=="4698"||/schtasks.*\/create/i.test(e.cmd),a=>"Tarea creada por "+a[0].user+" en "+a[0].host+": "+a[0].cmd.slice(0,80));
+grp("Servicio nuevo","Media",e=>e.eid=="7045",a=>"Servicio instalado por "+a[0].user+": "+a[0].cmd.slice(0,80));
+Object.values(by(EV.filter(e=>/^[a-z]:\\(programdata|temp|users\\public)\\[^\\ ]+\.exe/i.test(e.cmd)),e=>e.cmd)).filter(a=>a.length>=3).forEach(a=>add("Ejecución desde ruta no estándar","Alta",a,KS(a),a.length+" ejecuciones de "+a[0].cmd));
+grp("Reconocimiento interno","Media",e=>!/^\//.test(e.cmd)&&!/apppool/i.test(e.user)&&/Get-LocalGroupMember|Get-SmbShare|net(\.exe)?\s+(view|user|group|localgroup)|nltest|whoami/i.test(txt(e)),a=>a.length+" comandos de enumeración de "+a[0].user);
+const wb=EV.filter(e=>e.eid=="HTTP_ACCESS"||(/^\//.test(e.cmd)&&/http/i.test(e.msg)));
+Object.values(by(wb.filter(e=>e.src),e=>e.src)).forEach(a=>{const keys=["s:"+a[0].src,"h:"+a[0].host];if(a.some(e=>/\.(aspx|php|jsp)\b.*[?&]cmd=|[?&]cmd=|whoami|\/etc\/passwd|union select|<script/i.test(e.cmd)))add("Comandos vía web (web shell)","Alta",a,keys,a.length+" solicitudes de "+a[0].src+" con parámetros de ejecución");else if(a.length>=10&&a.filter(e=>/^[45]/.test(e.res)).length>=5)add("Sondeo web","Media",a,keys,a.length+" solicitudes con errores desde "+a[0].src)});
+const ap=EV.filter(e=>/apppool|w3wp|iis/i.test(e.user)&&/cmd\.exe|powershell/i.test(e.cmd));add("Proceso hijo de servidor web","Alta",ap,ap.flatMap(e=>["u:"+e.user,"h:"+e.host]),ap.length+" proceso(s) lanzados por el servidor web: "+(ap[0]||{cmd:""}).cmd);
+Object.values(by(EV.filter(e=>/bytes_out=\d+/.test(e.cmd+e.msg)),e=>e.user+"|"+e.dst)).forEach(a=>{const b=a.reduce((s,e)=>s+ +((e.cmd+e.msg).match(/bytes_out=(\d+)/)||[0,0])[1],0);if(b>=5e7||a.length>=10)add("Exfiltración HTTPS",b>=5e7?"Crítica":"Alta",a,KS(a),a.length+" envíos a "+a[0].dst+" ("+(b/1e6).toFixed(1)+" MB)")});
+const ob=EV.filter(e=>ext((e.dst||"").split(":")[0])&&/powershell|cmd\.exe|wscript|rundll32/i.test(txt(e)));add("Conexión saliente de script","Alta",ob,KS(ob),ob.length+" conexión(es) saliente(s) desde procesos de scripting a "+(ob[0]||{dst:""}).dst);
+Object.values(by(EV.filter(e=>/^(4663|5145|5140)$/.test(e.eid)&&/file access|\.(xlsx?|docx?|pdf|zip)\b/i.test(txt(e))),e=>e.user)).filter(a=>burst(a,10,10)).forEach(a=>add("Lectura masiva de archivos","Alta",a,KS(a),a.length+" accesos a archivos por "+a[0].user));
+const P=D.map((_,i)=>i),f=i=>P[i]==i?i:(P[i]=f(P[i])),km={};D.forEach((d,i)=>d.keys.forEach(k=>{if(km[k]!=null)P[f(i)]=f(km[k]);else km[k]=i}));
+const G=Object.values(by(D.map((d,i)=>({d,i})),o=>f(o.i))).map(a=>a.map(o=>o.d)),RK={Crítica:3,Alta:2,Media:1,Baja:0},RN=["Baja","Media","Alta","Crítica"];
+const I=G.map(ds=>{const set=new Set(ds.flatMap(d=>d.es.map(e=>e.i))),es=[...set].map(i=>EV[i]).sort((a,b)=>a.t-b.t),us=new Set(ds.filter(d=>!d.nu).flatMap(d=>d.es.map(e=>e.user)).filter(uv)),ips=new Set(es.map(e=>e.src).filter(ext)),lo=es[0].t-6e5,hi=es[es.length-1].t+6e5,cx=EV.filter(e=>!set.has(e.i)&&e.t>=lo&&e.t<=hi&&(us.has(e.user)||ips.has(e.src))),tids=[...new Set(ds.flatMap(d=>RU[d.rule][0]))],ph=[...new Set(tids.map(t=>TT[t][2]))],sev=RN[Math.max(...ds.map(d=>RK[d.sev]))];
+const rules=[...new Set(ds.map(d=>d.rule))],hs=[...new Set(es.map(e=>e.host).filter(Boolean))],dst=[...new Set(es.map(e=>(e.dst||"").split(":")[0]).filter(ext))];
+return{ds,es,cx,t0:es[0].t,t1:es[es.length-1].t,sev,tids,ph,rules,users:[...new Set(es.map(e=>e.user).filter(uv))],ips:[...ips],hosts:hs,dst,conf:(n=>n>=4?"Alta":n>=2?"Media":"Baja")(ph.length+(rules.length>=2?1:0)+(rules.length>=3?1:0)),name:rules.slice(0,3).join(" + ")}});
+I.sort((a,b)=>RK[b.sev]-RK[a.sev]||a.t0-b.t0).forEach((x,i)=>x.id="INC-"+fmt(x.t0).slice(0,10).replace(/-/g,"")+"-"+String(i+1).padStart(3,"0"));return I}
+const stat=n=>{const ts=EV.map(e=>e.t).filter(Boolean);return '<div class="grid"><div class="card"><h3>Archivo</h3>'+H(n)+'</div><div class="card"><h3>Eventos</h3><b style="font-size:22px">'+EV.length+'</b></div><div class="card"><h3>Rango</h3>'+(ts.length?fmt(Math.min(...ts))+"<br>"+fmt(Math.max(...ts)):"sin fechas")+'</div><div class="card"><h3>Incidentes</h3><b style="font-size:22px">'+INC.length+'</b></div></div>'};
+const flag=new Map();
+function tbl(){INC.forEach(x=>x.es.forEach(e=>flag.set(e.i,x.id)));const q=$("#q").value.toLowerCase(),r=EV.filter(e=>!q||(e.id+e.host+e.user+e.src+e.dst+e.eid+e.msg+e.cmd).toLowerCase().includes(q));$("#qn").textContent=r.length+" eventos"+(r.length>300?" (se muestran 300)":"");$("#tb").innerHTML="<tr><th>ID<th>Hora<th>Host<th>Usuario<th>Origen<th>Evento<th>Detalle<th>Incidente</tr>"+r.slice(0,300).map(e=>"<tr><td>"+H(e.id)+"<td>"+(e.t?fmt(e.t):"")+"<td>"+H(e.host)+"<td>"+H(e.user)+"<td>"+H(e.src)+"<td>"+H(e.eid)+'<td class="q">'+H((e.cmd||e.msg).slice(0,110))+"<td>"+(flag.has(e.i)?'<span class="tag Alta">'+flag.get(e.i).slice(-3)+"</span>":"")).join("")}
+function dia(x){const adv=x.ips.length?x.ips.join(", "):"No atribuido"+(x.users.length?" (posible cuenta comprometida: "+x.users.slice(0,3).join(", ")+")":""),inf=[...x.ips,...x.dst].join(", ")||"Interna / no observada",cap=x.tids.map(t=>t+" "+TT[t][0]).join("; "),vic=[...x.hosts,...x.users].slice(0,8).join(", ");return{adv,inf,cap,vic}}
+const facts=x=>x.ds.slice().sort((a,b)=>a.es[0].t-b.es[0].t).slice(0,4).map(d=>fmt(d.es[0].t)+" · "+d.rule+": "+d.note+" ["+d.es[0].id+(d.es.length>1?" … "+d.es[d.es.length-1].id:"")+"]");
+const pend=x=>[...new Set(x.rules.map(r=>RU[r][1]))].concat(["¿Hay ticket o ventana de mantenimiento que lo justifique?","Confirmar el alcance real con EDR/proxy (el log no prueba el impacto)"]);
+const recs=x=>[...new Set(x.rules.map(r=>RU[r][2]))];
+function incs(){$("#inc").innerHTML=INC.length?INC.map(x=>{const d=dia(x);return '<div class="card"><h3>'+x.id+' · <span class="tag '+x.sev+'">'+x.sev+"</span> · confianza "+x.conf+"</h3><b>"+H(x.name)+'</b><div class="sm">'+fmt(x.t0)+" → "+fmt(x.t1)+" · "+x.es.length+" eventos + "+x.cx.length+" de contexto</div><p class='kc'>"+KC.map(k=>"<span"+(x.ph.includes(k)?' class="on"':"")+">"+k+"</span>").join("")+"</p><div>"+x.tids.map(t=>'<span class="tag Media">'+t+" "+TT[t][0]+"</span>").join("")+'</div><div class="grid" style="margin-top:8px"><div class="dm"><b>Adversario</b><br>'+H(d.adv)+'</div><div class="dm"><b>Infraestructura</b><br>'+H(d.inf)+'</div><div class="dm"><b>Capacidad</b><br>'+H(d.cap)+'</div><div class="dm"><b>Víctima</b><br>'+H(d.vic)+"</div></div><ul>"+facts(x).map(f=>"<li>"+H(f)+"</li>").join("")+"</ul><details><summary>Pendientes y acciones</summary><b>Pendientes</b><ul>"+pend(x).map(f=>"<li>"+H(f)+"</li>").join("")+"</ul><b>Acciones sugeridas</b><ul>"+recs(x).map(f=>"<li>"+H(f)+"</li>").join("")+"</ul></details>"+'<div class="grid report-actions" style="margin-top:10px"><button class="b" data-r="'+x.id+'" data-report-type="e">Informe ejecutivo individual</button><button class="b s" data-r="'+x.id+'" data-report-type="t">Informe técnico individual</button></div></div>' }).join(""):'<div class="card">No se detectaron incidentes con las reglas actuales. Revisa los eventos importados.</div>'}
+function sel(){const n=$("#rs");if(n)n.textContent=INC.length+" incidente(s) disponibles para el informe completo."}
+function rep(x,t){const d=dia(x),c=ld("ll_cfg",{}),imp=x.tids.map(i=>TT[i][1]);let s="<h2>"+x.id+" · "+H(x.name)+"</h2><p><b>Severidad:</b> "+x.sev+" · <b>Confianza:</b> "+x.conf+" · <b>Ventana:</b> "+fmt(x.t0)+" a "+fmt(x.t1)+"</p>";
+s+="<p>"+(t=="e"?"Se detectó actividad de severidad "+x.sev+" que involucra a "+H(x.hosts.slice(0,5).join(", ")||"hosts no identificados")+" y a las cuentas "+H(x.users.slice(0,5).join(", "))+". El patrón observado combina: "+H(x.rules.join(", "))+". ":"")+"Los eventos forman una secuencia coherente en "+x.ph.length+" fase(s) de la Cyber Kill Chain; la confianza es "+x.conf+" y depende de las fuentes disponibles.</p>";
+if(t=="e"){s+="<h2>Impacto potencial</h2><ul>"+(imp.includes("Impact")?"<li>Pérdida de la capacidad de recuperación (copias de seguridad eliminadas).</li>":"")+(imp.includes("Exfiltration")?"<li>Posible salida de datos; el volumen real debe confirmarse con proxy/EDR.</li>":"")+(imp.includes("Persistence")?"<li>Acceso persistente al servidor afectado.</li>":"")+(imp.includes("Credential Access")?"<li>Cuentas con credenciales potencialmente comprometidas.</li>":"")+"<li>Estos puntos son inferencias del analista, no hechos confirmados.</li></ul>"}
+else{s+="<h2>Cronología</h2><div class='wrap'><table><tr><th>ID<th>Hora<th>Host<th>Usuario<th>Origen<th>Detalle</tr>"+x.es.map(e=>"<tr><td>"+H(e.id)+"<td>"+fmt(e.t)+"<td>"+H(e.host)+"<td>"+H(e.user)+"<td>"+H(e.src)+"<td>"+H((e.cmd||e.msg).slice(0,90))).join("")+"</table></div>"+(x.es.length>60?"<p class='sm'>Se muestran 60 de "+x.es.length+" eventos.</p>":"")+"<h2>Indicadores</h2><p><b>IPs:</b> "+H([...x.ips,...x.dst].join(", ")||"—")+"<br><b>Cuentas:</b> "+H(x.users.join(", "))+"<br><b>Hosts:</b> "+H(x.hosts.join(", "))+"</p><h2>MITRE ATT&amp;CK</h2><ul>"+x.tids.map(i=>"<li>"+i+" "+TT[i][0]+" · "+TT[i][1]+"</li>").join("")+"</ul><h2>Cyber Kill Chain</h2><p>"+KC.map(k=>x.ph.includes(k)?"<b>"+k+"</b>":k).join(" → ")+"</p><h2>Modelo Diamante</h2><ul><li><b>Adversario:</b> "+H(d.adv)+"</li><li><b>Infraestructura:</b> "+H(d.inf)+"</li><li><b>Capacidad:</b> "+H(d.cap)+"</li><li><b>Víctima:</b> "+H(d.vic)+"</li></ul><h2>Hechos con fuente</h2><ul>"+facts(x).map(f=>"<li>"+H(f)+"</li>").join("")+"</ul><h2>Hipótesis</h2><ul><li>Principal: "+H(x.rules.join(" + "))+" como actividad maliciosa.</li><li>Alternativa: actividad legítima no documentada.</li></ul>"}
+return s+"<h2>Pendientes</h2><ul>"+pend(x).map(f=>"<li>"+H(f)+"</li>").join("")+"</ul><h2>Acciones recomendadas</h2><ul>"+recs(x).map(f=>"<li>"+H(f)+"</li>").join("")+"</ul>"}
+function mk(t){
+ const c=ld("ll_cfg",{}),l=INC.slice(),sev={"Crítica":0,"Alta":0,"Media":0,"Baja":0};
+ l.forEach(x=>sev[x.sev]=(sev[x.sev]||0)+1);
+ const totalEvents=new Set(l.flatMap(x=>x.es.map(e=>e.i))).size;
+ const html="<div class='report-cover'><div class='report-brand'>HARYX <span>XDR</span></div><div class='report-sub'>EXTENDED DETECTION &amp; RESPONSE</div><h1>Informe "+(t=="e"?"ejecutivo":"técnico")+"</h1><p>Reporte consolidado de incidentes de seguridad</p></div>"+
+ "<div class='report-meta'><b>Organización:</b> "+H(c.co||"No configurada")+" &nbsp; | &nbsp; <b>Analista:</b> "+H(c.an||"No configurado")+"<br><b>Fecha de generación:</b> "+fmt(Date.now())+"<br><b>Incidentes incluidos:</b> "+l.length+" &nbsp; | &nbsp; <b>Eventos vinculados:</b> "+totalEvents+"</div>"+
+ "<h2>Resumen general</h2><div class='report-kpis'><div><b>"+l.length+"</b><span>Incidentes</span></div><div><b>"+sev["Crítica"]+"</b><span>Críticos</span></div><div><b>"+sev["Alta"]+"</b><span>Altos</span></div><div><b>"+sev["Media"]+"</b><span>Medios</span></div><div><b>"+sev["Baja"]+"</b><span>Bajos</span></div></div>"+
+ "<p>Este documento consolida todos los incidentes detectados en la importación actual. Los resultados corresponden a las reglas y correlaciones ejecutadas por HARYX XDR sobre los registros suministrados.</p>"+
+ "<h2>Índice de incidentes</h2><ol>"+l.map(x=>"<li><b>"+H(x.id)+" — "+H(x.name)+"</b> ("+H(x.sev)+")</li>").join("")+"</ol>"+
+ l.map((x,i)=>"<div class='report-incident'>"+(t=="t"?"<div class='report-kicker'>INCIDENTE "+(i+1)+" DE "+l.length+"</div>":"")+rep(x,t)+"</div>").join("")+
+ "<h2>Alcance y consideraciones</h2><p>La severidad, confianza y técnicas asociadas son resultados analíticos basados en los registros disponibles. Las asociaciones MITRE ATT&amp;CK son mapeos orientativos y deben validarse con evidencia adicional. Este informe no implica respuesta automática ni confirma atribución a un actor.</p>";
+ return {l,html};
+}
+
+function mkSingle(x,t){
+ const c=ld("ll_cfg",{}),title=t==="e"?"ejecutivo":"técnico";
+ const html="<div class='report-cover'><div class='report-brand'>HARYX <span>XDR</span></div><div class='report-sub'>EXTENDED DETECTION &amp; RESPONSE</div><h1>Informe "+title+"</h1><p>Reporte individual de incidente de seguridad</p></div>"+
+ "<div class='report-meta'><b>Organización:</b> "+H(c.co||"No configurada")+" &nbsp; | &nbsp; <b>Analista:</b> "+H(c.an||"No configurado")+"<br><b>Fecha de generación:</b> "+fmt(Date.now())+"<br><b>Incidente:</b> "+H(x.id)+" &nbsp; | &nbsp; <b>Severidad:</b> "+H(x.sev)+"</div>"+
+ rep(x,t)+
+ "<h2>Alcance y consideraciones</h2><p>Este documento corresponde únicamente al incidente seleccionado. Los hallazgos, severidad y asociaciones MITRE ATT&amp;CK son resultados analíticos basados en los registros disponibles y deben validarse con evidencia adicional. Este informe no implica respuesta automática ni confirma atribución a un actor.</p>";
+ return {html};
+}
+
+
+const caseStore=()=>ld("ll_cases",{});
+function renderDash(){
+ const sev={"Crítica":0,"Alta":0,"Media":0,"Baja":0};INC.forEach(x=>sev[x.sev]=(sev[x.sev]||0)+1);
+ const hosts=new Set(EV.map(e=>e.host).filter(Boolean)).size,ips=new Set(EV.map(e=>e.src).filter(Boolean)).size;
+ const top=Object.entries(sev).map(([k,v])=>`<div class="card metric"><h3>${k}</h3><strong>${v}</strong><small>Incidentes</small></div>`).join("");
+ const techniques={};INC.forEach(x=>x.tids.forEach(t=>techniques[t]=(techniques[t]||0)+1));
+ const topTech=Object.entries(techniques).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ const colors=["#b42318","#d97706","#2584c7","#15936b"];
+ const maxSev=Math.max(1,...Object.values(sev));
+ const bars=Object.entries(sev).map(([k,v],i)=>`<div class="chart-row"><span>${k}</span><div class="chart-track"><i style="width:${v/maxSev*100}%;background:${colors[i]}"></i></div><b>${v}</b></div>`).join("");
+ const dated=EV.filter(e=>Number.isFinite(+e.t)&&e.t>0);
+ const buckets={};dated.forEach(e=>{const d=new Date(e.t);const k=d.toLocaleDateString("es",{day:"2-digit",month:"2-digit"});buckets[k]=(buckets[k]||0)+1});
+ const series=Object.entries(buckets).slice(-7),maxEv=Math.max(1,...series.map(x=>x[1]));
+ const pts=series.map(([k,v],i)=>`${series.length<2?150:i*300/(series.length-1)+10},${105-v/maxEv*85}`).join(" ");
+ const line=series.length?`<svg viewBox="0 0 320 135" role="img" aria-label="Eventos por fecha"><line x1="8" y1="108" x2="312" y2="108" stroke="#dbe4ee"/><polyline points="${pts}" fill="none" stroke="#2584c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${series.map(([k,v],i)=>{const x=series.length<2?150:i*300/(series.length-1)+10,y=105-v/maxEv*85;return `<circle cx="${x}" cy="${y}" r="4" fill="#1769aa"/><text x="${x}" y="126" font-size="9" text-anchor="middle" fill="#64748b">${k}</text>`}).join("")}</svg>`:"<p class='sm'>No hay fechas válidas para graficar.</p>";
+ const techBars=topTech.map(([t,n])=>`<div class="chart-row"><span title="${H(TT[t]?.[0]||"Técnica")}">${t}</span><div class="chart-track"><i style="width:${n/Math.max(1,...topTech.map(z=>z[1]))*100}%"></i></div><b>${n}</b></div>`).join("");
+ const srcCounts=Object.entries(by(EV.filter(e=>e.src),e=>e.src)).map(([ip,a])=>[ip,a.length,a.filter(e=>flag.has(e.i)).length]).sort((a,b)=>b[1]-a[1]);
+ const dstCounts=Object.entries(by(EV.filter(e=>e.dst),e=>e.dst)).map(([ip,a])=>[ip,a.length]).sort((a,b)=>b[1]-a[1]);
+ const ipType=ip=>priv(ip)?"Privada":/^((192\\.0\\.2\\.)|(198\\.51\\.100\\.)|(203\\.0\\.113\\.))/.test(ip)?"Reservada (documentación)":ext(ip)?"Pública":"No identificada";
+ const ipRows=srcCounts.slice(0,8).map(([ip,n,linked])=>`<tr><td class="q">${H(ip)}</td><td><span class="ip-kind">${ipType(ip)}</span></td><td>${n}</td><td>${linked}</td></tr>`).join("");
+ const dstRows=dstCounts.slice(0,6).map(([ip,n])=>`<tr><td class="q">${H(ip)}</td><td>${n}</td></tr>`).join("");
+ const countries=Object.entries(by(EV.filter(e=>e.country),e=>e.country)).sort((a,b)=>b[1].length-a[1].length);
+ const countryHtml=countries.length?countries.slice(0,8).map(([c,a])=>`<div class="chart-row"><span>${H(c)}</span><div class="chart-track"><i style="width:${a.length/Math.max(1,...countries.map(z=>z[1].length))*100}%"></i></div><b>${a.length}</b></div>`).join(""):"<p class='sm'>El archivo no contiene país ni geolocalización. HARYX no inventa ubicaciones a partir de IP privadas o rangos reservados.</p>";
+ const geoNote=EV.some(e=>e.src&&/^((192\\.0\\.2\\.)|(198\\.51\\.100\\.)|(203\\.0\\.113\\.))/.test(e.src))?"Se detectaron IP de rangos reservados para documentación; no representan geolocalizaciones públicas reales.":"La ubicación geográfica solo se mostrará si el archivo incorpora esos campos.";
+ $("#dash").innerHTML=`<div class="grid"><div class="card metric"><h3>Eventos analizados</h3><strong>${EV.length}</strong><small>Registros normalizados</small></div><div class="card metric"><h3>Incidentes</h3><strong>${INC.length}</strong><small>Correlaciones detectadas</small></div><div class="card metric"><h3>Hosts afectados</h3><strong>${hosts}</strong><small>Activos distintos observados</small></div><div class="card metric"><h3>IPs observadas</h3><strong>${ips}</strong><small>Direcciones de origen distintas</small></div></div><div class="grid">${top}</div><div class="chart-grid"><div class="card chart-card"><h3>Incidentes por severidad</h3>${bars}<p class="sm">Distribución de incidentes detectados por nivel de severidad.</p></div><div class="card chart-card"><h3>Actividad de eventos en el tiempo</h3>${line}<p class="sm">Conteo de registros por día (hasta los últimos 7 días presentes en el archivo).</p></div><div class="card chart-card"><h3>Técnicas MITRE más observadas</h3>${techBars||"<p class='sm'>Sin técnicas asociadas todavía.</p>"}</div><div class="card chart-card"><h3>Países de origen</h3>${countryHtml}<p class="sm">${geoNote}</p></div></div><div class="chart-grid"><div class="card chart-card"><h3>IPs de origen más frecuentes</h3><div class="wrap"><table style="min-width:0"><tr><th>IP origen</th><th>Tipo</th><th>Eventos</th><th>En incidentes</th></tr>${ipRows||"<tr><td colspan='4'>No hay IP de origen.</td></tr>"}</table></div></div><div class="card chart-card"><h3>Destinos más observados</h3><div class="wrap"><table style="min-width:0"><tr><th>Destino</th><th>Eventos</th></tr>${dstRows||"<tr><td colspan='2'>No hay destinos registrados.</td></tr>"}</table></div></div></div><div class="card"><h3>Alcance y geolocalización</h3><p class="sm">Hosts distintos: <b>${hosts}</b> · IPs origen: <b>${ips}</b> · Destinos distintos: <b>${dstCounts.length}</b>. Las IP privadas identifican activos internos y no tienen país público asignable. Para geolocalizar IP públicas reales se necesita una fuente GeoIP y que el registro contenga una IP enrutable.</p></div>`;
+ // Analítica de activos e investigación: se calcula exclusivamente con EV e INC.
+ const incEvents=new Set(INC.flatMap(x=>x.es.map(e=>e.i)));
+ const incRows=EV.filter(e=>incEvents.has(e.i));
+ const assetMap=by(incRows.filter(e=>e.host),e=>e.host);
+ const assetRows=Object.entries(assetMap).map(([host,a])=>{
+   const ids=[...new Set(INC.filter(x=>x.es.some(e=>e.host===host)).map(x=>x.id))];
+   const levels=INC.filter(x=>x.es.some(e=>e.host===host)).map(x=>x.sev);
+   const rank={"Crítica":4,"Alta":3,"Media":2,"Baja":1};
+   const severity=levels.sort((a,b)=>(rank[b]||0)-(rank[a]||0))[0]||"Sin clasificar";
+   return {host,events:a.length,users:[...new Set(a.map(e=>e.user).filter(uv))].length,ids,severity};
+ }).sort((a,b)=>(rankSafe(b.severity)-rankSafe(a.severity))||b.events-a.events).slice(0,8);
+ function rankSafe(s){return {"Crítica":4,"Alta":3,"Media":2,"Baja":1}[s]||0}
+ const userMap=by(incRows.filter(e=>uv(e.user)),e=>e.user);
+ const userRows=Object.entries(userMap).map(([user,a])=>({user,events:a.length,hosts:[...new Set(a.map(e=>e.host).filter(Boolean))].length,ips:[...new Set(a.map(e=>e.src).filter(Boolean))].length})).sort((a,b)=>b.events-a.events).slice(0,8);
+ const incidentIpMap=by(incRows.filter(e=>e.src),e=>e.src);
+ const incidentIpRows=Object.entries(incidentIpMap).map(([ip,a])=>({ip,n:a.length,hosts:[...new Set(a.map(e=>e.host).filter(Boolean))].length,kind:ipType(ip)})).sort((a,b)=>b.n-a.n).slice(0,10);
+ const tacticCounts={};INC.forEach(x=>x.ph.forEach(t=>tacticCounts[t]=(tacticCounts[t]||0)+1));
+ const tacticRows=Object.entries(tacticCounts).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<div class="chart-row"><span>${H(t)}</span><div class="chart-track"><i style="width:${n/Math.max(1,...Object.values(tacticCounts))*100}%"></i></div><b>${n}</b></div>`).join("");
+ const alertRows=INC.slice().sort((a,b)=>rankSafe(b.sev)-rankSafe(a.sev)||a.t0-b.t0).map(x=>`<tr><td>${H(x.id)}</td><td><span class="tag ${x.sev}">${H(x.sev)}</span></td><td>${H(x.rules.join(" + "))}</td><td>${H(x.hosts.join(", ")||"No identificado")}</td><td>${x.es.length}</td><td>${fmt(x.t0)}</td></tr>`).join("");
+ const assetHtml=assetRows.map(x=>`<tr><td><b>${H(x.host)}</b></td><td><span class="tag ${x.severity}">${H(x.severity)}</span></td><td>${x.events}</td><td>${x.users}</td><td>${x.ids.length}</td></tr>`).join("");
+ const userHtml=userRows.map(x=>`<tr><td>${H(x.user)}</td><td>${x.events}</td><td>${x.hosts}</td><td>${x.ips}</td></tr>`).join("");
+ const incidentIpHtml=incidentIpRows.map(x=>`<tr><td class="q">${H(x.ip)}</td><td>${H(x.kind)}</td><td>${x.n}</td><td>${x.hosts}</td></tr>`).join("");
+ const countryData=Object.entries(by(incRows.filter(e=>e.country),e=>e.country)).sort((a,b)=>b[1].length-a[1].length);
+ const countryIncidentHtml=countryData.length?countryData.slice(0,8).map(([c,a])=>`<div class="chart-row"><span>${H(c)}</span><div class="chart-track"><i style="width:${a.length/Math.max(1,...countryData.map(z=>z[1].length))*100}%"></i></div><b>${a.length}</b></div>`).join(""):"<p class='sm'>No hay países asociados a los eventos de incidentes. El Excel de muestra no incluye una columna de país.</p>";
+ $("#dash").insertAdjacentHTML("beforeend",`<div class="chart-grid">
+ <div class="card chart-card"><h3>Activos involucrados en incidentes</h3><p class="sm">Equipos que aparecen en eventos que forman parte de una correlación. No equivale a confirmar compromiso.</p><div class="wrap"><table style="min-width:0"><tr><th>Activo</th><th>Severidad máx.</th><th>Eventos</th><th>Usuarios</th><th>Incidentes</th></tr>${assetHtml||"<tr><td colspan='5'>Sin activos asociados.</td></tr>"}</table></div></div>
+ <div class="card chart-card"><h3>Usuarios involucrados</h3><p class="sm">Cuentas presentes en eventos vinculados a incidentes.</p><div class="wrap"><table style="min-width:0"><tr><th>Cuenta</th><th>Eventos</th><th>Hosts</th><th>IPs origen</th></tr>${userHtml||"<tr><td colspan='4'>Sin usuarios identificados.</td></tr>"}</table></div></div>
+ </div><div class="chart-grid">
+ <div class="card chart-card"><h3>IPs de origen dentro de incidentes</h3><p class="sm">Incluye direcciones privadas y reservadas para no ocultar la infraestructura interna.</p><div class="wrap"><table style="min-width:0"><tr><th>IP origen</th><th>Clasificación</th><th>Eventos</th><th>Hosts</th></tr>${incidentIpHtml||"<tr><td colspan='4'>Sin IP de origen en incidentes.</td></tr>"}</table></div></div>
+ <div class="card chart-card"><h3>Fases tácticas observadas</h3>${tacticRows||"<p class='sm'>Sin tácticas asociadas.</p>"}<p class="sm">Conteo de incidentes que contienen técnicas mapeadas a cada fase; una correlación puede aparecer en varias fases.</p></div>
+ </div><div class="chart-grid">
+ <div class="card chart-card"><h3>Países asociados a incidentes</h3>${countryIncidentHtml}<p class="sm">Solo se muestran países presentes en columnas del archivo. No se consulta ni se inventa geolocalización.</p></div>
+ <div class="card chart-card"><h3>Auditoría de correlaciones</h3><p class="sm">Cada fila corresponde a un incidente que produjo el motor de reglas actual. Permite revisar por qué el total es ${INC.length}.</p><div class="wrap"><table style="min-width:0"><tr><th>ID</th><th>Severidad</th><th>Reglas relacionadas</th><th>Hosts</th><th>Eventos</th><th>Inicio</th></tr>${alertRows||"<tr><td colspan='6'>Sin alertas.</td></tr>"}</table></div></div>
+ </div><div class="card"><h3>Centro de alertas correlacionadas</h3><p class="sm">Alertas generadas al procesar el archivo. No es monitoreo en vivo: para eso se necesita una fuente de eventos continua o integración SIEM/EDR.</p><div class="wrap"><table style="min-width:0"><tr><th>Incidente</th><th>Severidad</th><th>Detecciones</th><th>Activos</th><th>Eventos</th><th>Fecha</th></tr>${alertRows||"<tr><td colspan='6'>Sin alertas.</td></tr>"}</table></div></div>`);
+
+}
+function renderMitre(){
+ const counts={};INC.forEach(x=>x.tids.forEach(t=>counts[t]=(counts[t]||0)+1));
+ const entries=Object.entries(TT);
+ $("#mitre").innerHTML=`<div class="card"><div class="grid"><div><b>${entries.length}</b><div class="sm">Técnicas mapeadas por reglas</div></div><div><b>${Object.keys(counts).length}</b><div class="sm">Técnicas observadas en incidentes</div></div><div><b>${INC.length}</b><div class="sm">Incidentes correlacionados</div></div></div></div><div class="mitre-grid">${entries.map(([id,v])=>`<div class="mitre-card"><b>${id} · ${H(v[0])}</b><small>${H(v[1])} · Fase: ${H(v[2])}</small><p><span class="pill">${counts[id]||0} incidente(s)</span></p></div>`).join("")}</div>`;
+}
+function renderTimeline(){
+ const es=INC.flatMap(x=>x.es.map(e=>({e,x}))).sort((a,b)=>a.e.t-b.e.t).slice(0,250);
+ $("#timeline").innerHTML=es.length?`<div class="card"><p class="sm">Se muestran hasta 250 eventos vinculados a incidentes, ordenados por fecha.</p><div class="timeline">${es.map(({e,x})=>`<div class="timeline-item"><b>${e.t?fmt(e.t):"Fecha no disponible"} · ${H(x.id)}</b><div>${H(x.name)} <span class="tag ${x.sev}">${x.sev}</span></div><div class="sm">${H(e.host)} · ${H(e.user)} · ${H(e.src)} · Evento ${H(e.eid)}</div><div>${H((e.cmd||e.msg).slice(0,180))}</div></div>`).join("")}</div></div>`:"<div class='card'>No hay eventos de incidentes. Importa un archivo para generar la cronología.</div>";
+}
+function renderCases(){
+ const saved=caseStore();
+ $("#cases").innerHTML=INC.length?INC.map(x=>{const c=saved[x.id]||{};return `<div class="card"><div class="toolbar"><b>${x.id} · ${H(x.name)}</b><span class="tag ${x.sev}">${x.sev}</span><span class="sm">${x.es.length} eventos · ${x.tids.join(", ")}</span></div><div class="grid"><div><label>Estado</label><select data-case="${x.id}" data-field="status"><option ${(!c.status||c.status==="Nuevo")?"selected":""}>Nuevo</option><option ${c.status==="En investigación"?"selected":""}>En investigación</option><option ${c.status==="Contención"?"selected":""}>Contención</option><option ${c.status==="Cerrado"?"selected":""}>Cerrado</option><option ${c.status==="Falso positivo"?"selected":""}>Falso positivo</option></select></div><div><label>Responsable</label><input data-case="${x.id}" data-field="owner" value="${H(c.owner||"")}" placeholder="Analista asignado"></div></div><label>Notas de investigación</label><textarea data-case="${x.id}" data-field="notes" rows="2" placeholder="Hallazgos, evidencias y decisiones...">${H(c.notes||"")}</textarea><p class="sm">Los cambios se guardan en el almacenamiento local del navegador.</p></div>`}).join(""):"<div class='card'>No hay incidentes para gestionar. Importa los logs primero.</div>";
+ $("#cases").querySelectorAll("[data-case]").forEach(el=>el.onchange=el.oninput=()=>{const all=caseStore(),id=el.dataset.case,f=el.dataset.field;all[id]=all[id]||{};all[id][f]=el.value;sv("ll_cases",all)});
+}
+const TABS=[["s-imp","Importar"],["s-dash","Dashboard"],["s-evt","Eventos"],["s-inc","Incidentes"],["s-mitre","MITRE ATT&CK"],["s-time","Timeline"],["s-cases","Casos"],["s-rep","Informes"],["s-cfg","Ajustes"]];
+function show(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id==id));$("#nav").classList.toggle("hidden",id==="s-welcome");$("#nav").innerHTML=TABS.map(t=>'<button data-t="'+t[0]+'"'+(t[0]==id?' class="on"':"")+">"+t[1]+"</button>").join("")}
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-t]"),r=e.target.closest("[data-r]");
+ if(t)show(t.dataset.t);
+ if(r){
+   const incident=INC.find(x=>String(x.id)===String(r.dataset.r));
+   const type=r.dataset.reportType||"t";
+   if(!incident){alert("No se encontró el incidente seleccionado. Vuelve a importar los registros.");return;}
+   $("#rep").innerHTML=mkSingle(incident,type).html;
+   show("s-rep");
+   setTimeout(()=>window.print(),150);
+ }
+});
+const dz=$("#dz"),fi=$("#fi");$("#welcomeNext").onclick=()=>show("s-imp");dz.onclick=()=>fi.click();fi.onchange=()=>fi.files[0]&&load(fi.files[0]).catch(e=>alert("Error al importar: "+e.message));
+dz.ondragover=e=>{e.preventDefault();dz.classList.add("h")};dz.ondragleave=()=>dz.classList.remove("h");dz.ondrop=e=>{e.preventDefault();dz.classList.remove("h");e.dataTransfer.files[0]&&load(e.dataTransfer.files[0]).catch(x=>alert("Error al importar: "+x.message))};
+$("#q").oninput=tbl;
+$("#g1").onclick=()=>{if(!INC.length){$("#rs").textContent="No hay incidentes. Importa primero un archivo con registros.";return;}$("#rep").innerHTML=mk($("#rt").value).html;$("#rs").textContent="Informe "+($("#rt").value==="e"?"ejecutivo":"técnico")+" preparado con "+INC.length+" incidente(s).";};
+$("#g3").onclick=()=>{if(!INC.length){$("#rs").textContent="No hay incidentes para incluir. Importa primero los registros.";return;}$("#rep").innerHTML=mk($("#rt").value).html;$("#rs").textContent="Preparando un único PDF con "+INC.length+" incidente(s). En impresión selecciona Guardar como PDF.";show("s-rep");setTimeout(()=>window.print(),150);};
+const C0=ld("ll_cfg",{});$("#co").value=C0.co||"";$("#an").value=C0.an||"";
+$("#sv").onclick=()=>{sv("ll_cfg",{co:$("#co").value,an:$("#an").value});$("#cm").textContent="Datos guardados correctamente";};
+renderDash();renderMitre();renderTimeline();renderCases();show("s-welcome");
+</script></body></html>
